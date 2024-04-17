@@ -1,0 +1,42 @@
+name: ll
+
+services:
+  host:
+    depends_on: 
+      - ansible-host
+    deploy:
+      replicas: 3
+    build:
+      context: ../
+      dockerfile: docker/host.dockerfile
+    tty: true
+    expose:
+      - 22
+    networks:
+      - ansible-internal
+    volumes:
+      - keys:/root/.ssh
+    
+  ansible-host:
+    container_name: ll-ansible-host
+    hostname: ll-ansible-host
+    build:
+      context: ../
+      dockerfile: docker/ansible.dockerfile
+    tty: true
+    expose: 
+      - 22
+    networks:
+      - ansible-internal
+    volumes:
+      - keys:/root/.ssh
+      - ../ansible:/ansible
+    environment:
+      ANSIBLE_HOST_KEY_CHECKING: False
+  
+networks:
+  ansible-internal:
+    driver: bridge
+
+volumes:
+  keys: {}

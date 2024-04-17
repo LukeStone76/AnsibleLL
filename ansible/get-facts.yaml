@@ -1,0 +1,29 @@
+---
+
+- hosts: all
+  vars: 
+    f_name: /ansible/artefacts/{{ host_label }}.facts.json
+  tasks:
+    - name: Cache facts 
+      ansible.builtin.set_fact:
+        host_facts: "{{ ansible_facts }}"
+        host_label: "{{ ansible_host }}"
+
+    - name: Ensure path exists
+      delegate_to: localhost 
+      run_once: true
+      ansible.builtin.file:
+        state: directory
+        path: "{{ f_name.split('/')[:-1] | join('/') }}"
+        mode: 0777 # Execute permissions allows docker host to navigate directory
+
+    - name: Save file
+      delegate_to: localhost
+      ansible.builtin.copy:
+        content: "{{ host_facts | to_nice_json }}"
+        dest: "{{ f_name }}"
+        mode: 0666
+
+    - name: Print message
+      ansible.builtin.debug:
+        msg: "File saved to '{{ f_name }}' on host machine"

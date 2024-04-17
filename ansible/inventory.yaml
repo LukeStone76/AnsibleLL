@@ -1,0 +1,8 @@
+all:
+  vars:
+    ansible_user: root 
+    ansble_ssh_pivate_key_file: /root/.ssh/id_rsa
+  hosts:
+    ll-host-1: {}
+    ll-host-2: {}
+    ll-host-3: {}
